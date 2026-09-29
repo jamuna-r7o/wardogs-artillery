@@ -46,10 +46,10 @@
   <h1>Artillery Distance</h1>
 
   <label for="gun">My position (X,Y)</label>
-  <input id="gun" placeholder="98.43,110.38" autocomplete="off" autofocus>
+  <input id="gun" placeholder="x98.43, y110.38" autocomplete="off" autofocus>
 
   <label for="tgt">Enemy position (X,Y)</label>
-  <input id="tgt" placeholder="94.53,109.03" autocomplete="off">
+  <input id="tgt" placeholder="x94.53, y109.03" autocomplete="off">
 
   <div class="out" id="out"><span class="sub">Enter both positions.</span></div>
 
@@ -62,9 +62,9 @@
   var out = document.getElementById('out');
 
   function parse(s) {
-    var p = s.trim().split(/[\s,;]+/).filter(function (v) { return v !== ''; });
-    if (p.length !== 2) return null;
-    var x = parseFloat(p[0]), y = parseFloat(p[1]);
+    var nums = s.match(/-?\d+(?:\.\d+)?/g);
+    if (!nums || nums.length !== 2) return null;
+    var x = parseFloat(nums[0]), y = parseFloat(nums[1]);
     if (isNaN(x) || isNaN(y)) return null;
     return { x: x, y: y };
   }
