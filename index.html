@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Artillery Distance</title>
+<style>
+  body {
+    background: #1e1e1e;
+    color: #eee;
+    font-family: system-ui, sans-serif;
+    margin: 0;
+    padding: 24px;
+    display: flex;
+    justify-content: center;
+  }
+  .box { width: 100%; max-width: 420px; }
+  h1 { font-size: 20px; margin: 0 0 20px; }
+  label { display: block; margin: 14px 0 4px; font-size: 14px; color: #aaa; }
+  input {
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 20px;
+    padding: 10px;
+    background: #2c2c2c;
+    color: #fff;
+    border: 1px solid #444;
+    border-radius: 6px;
+  }
+  input:focus { outline: none; border-color: #c8a13a; }
+  .out {
+    margin-top: 24px;
+    padding: 16px;
+    background: #2c2c2c;
+    border-radius: 6px;
+    border-left: 4px solid #c8a13a;
+  }
+  .dist { font-size: 42px; font-weight: 700; line-height: 1; }
+  .sub { margin-top: 10px; font-size: 14px; color: #aaa; }
+  .err { color: #e07070; font-size: 14px; }
+  .hint { margin-top: 18px; font-size: 12px; color: #777; }
+</style>
+</head>
+<body>
+<div class="box">
+  <h1>Artillery Distance</h1>
+
+  <label for="gun">My position (X,Y)</label>
+  <input id="gun" placeholder="98.43,110.38" autocomplete="off" autofocus>
+
+  <label for="tgt">Enemy position (X,Y)</label>
+  <input id="tgt" placeholder="94.53,109.03" autocomplete="off">
+
+  <div class="out" id="out"><span class="sub">Enter both positions.</span></div>
+
+  <div class="hint">distance = &radic;(&Delta;x&sup2; + &Delta;y&sup2;) &times; 100 m &nbsp;&middot;&nbsp; bearing is clockwise from north (Y up)</div>
+</div>
+
+<script>
+  var gun = document.getElementById('gun');
+  var tgt = document.getElementById('tgt');
+  var out = document.getElementById('out');
+
+  function parse(s) {
+    var p = s.trim().split(/[\s,;]+/).filter(function (v) { return v !== ''; });
+    if (p.length !== 2) return null;
+    var x = parseFloat(p[0]), y = parseFloat(p[1]);
+    if (isNaN(x) || isNaN(y)) return null;
+    return { x: x, y: y };
+  }
+
+  function calc() {
+    var a = parse(gun.value);
+    var b = parse(tgt.value);
+
+    if (!a || !b) {
+      var msg = (gun.value.trim() === '' && tgt.value.trim() === '')
+        ? '<span class="sub">Enter both positions.</span>'
+        : '<span class="err">Need two numbers per box, e.g. 98.43,110.38</span>';
+      out.innerHTML = msg;
+      return;
+    }
+
+    var dx = b.x - a.x;
+    var dy = b.y - a.y;
+    var dist = Math.sqrt(dx * dx + dy * dy);
+
+    var bearing = (Math.atan2(dx, dy) * 180 / Math.PI + 360) % 360;
+
+    out.innerHTML =
+      '<div class="dist">' + (dist * 100).toFixed(0) + ' m</div>' +
+      '<div class="sub">bearing ' + bearing.toFixed(1) + '&deg;' +
+      ' &nbsp;&middot;&nbsp; ' + dist.toFixed(2) + ' coords' +
+      ' &nbsp;&middot;&nbsp; &Delta;x ' + dx.toFixed(2) +
+      ' &nbsp;&middot;&nbsp; &Delta;y ' + dy.toFixed(2) + '</div>';
+  }
+
+  gun.addEventListener('input', calc);
+  tgt.addEventListener('input', calc);
+</script>
+</body>
+</html>
